@@ -5,68 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Installation Work Report</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="container">
-        <h1>📝 บันทึกรายงานความคืบหน้างานติดตั้ง</h1>
-        <form id="reportForm">
-            <div class="form-grid">
-                <div class="form-group span-2">
-                    <label for="sectionTitleEN">Section Title (EN)</label>
-                    <input type="text" id="sectionTitleEN" required>
-                </div>
-                <div class="form-group span-2">
-                    <label for="sectionTitleCN">部分标题 (中文)</label>
-                    <input type="text" id="sectionTitleCN">
+        <header>
+            <h1>📝 บันทึกรายงานความคืบหน้างานติดตั้ง</h1>
+            <p>กรอกรายละเอียดงานประจำวันและอัปโหลดรูปภาพประกอบ</p>
+        </header>
+
+        <main>
+            <form id="reportForm">
+                <div class="form-grid">
+                    <!-- Section Title -->
+                    <div class="form-group span-2">
+                        <label for="sectionTitleEN">Section Title (EN)</label>
+                        <input type="text" id="sectionTitleEN" required>
+                    </div>
+                    <div class="form-group span-2">
+                        <label for="sectionTitleCN">部分标题 (中文)</label>
+                        <input type="text" id="sectionTitleCN">
+                    </div>
+                    
+                    <!-- Morning Session -->
+                    <fieldset class="span-4">
+                        <legend>☀️ ช่วงเช้า (Morning)</legend>
+                        <div class="fieldset-grid">
+                            <div class="form-group span-2">
+                                <label for="descMorningEN">Description (Morning)</label>
+                                <textarea id="descMorningEN" rows="4"></textarea>
+                            </div>
+                            <div class="form-group span-2">
+                                <label for="descMorningCN">描述 (早晨)</label>
+                                <textarea id="descMorningCN" rows="4"></textarea>
+                            </div>
+                            <div class="form-group span-4 file-upload">
+                                <label for="imageMorning">อัปโหลดรูปภาพ (เช้า)</label>
+                                <input type="file" id="imageMorning" accept="image/*">
+                                <img id="previewMorning" class="image-preview" src="#" alt="Morning Image Preview">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Afternoon Session -->
+                    <fieldset class="span-4">
+                        <legend>🌙 ช่วงบ่าย (Afternoon)</legend>
+                        <div class="fieldset-grid">
+                            <div class="form-group span-2">
+                                <label for="descAfternoonEN">Description (Afternoon)</label>
+                                <textarea id="descAfternoonEN" rows="4"></textarea>
+                            </div>
+                            <div class="form-group span-2">
+                                <label for="descAfternoonCN">描述 (下午)</label>
+                                <textarea id="descAfternoonCN" rows="4"></textarea>
+                            </div>
+                            <div class="form-group span-4 file-upload">
+                                <label for="imageAfternoon">อัปโหลดรูปภาพ (บ่าย)</label>
+                                <input type="file" id="imageAfternoon" accept="image/*">
+                                <img id="previewAfternoon" class="image-preview" src="#" alt="Afternoon Image Preview">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Remarks -->
+                    <div class="form-group span-4">
+                        <label for="remarks">หมายเหตุ / 备注 (Remarks)</label>
+                        <textarea id="remarks" rows="3"></textarea>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="descMorningEN">Description (Morning)</label>
-                    <textarea id="descMorningEN" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="descMorningCN">描述 (早晨)</label>
-                    <textarea id="descMorningCN" rows="3"></textarea>
-                </div>
-                <div class="form-group span-2 file-upload">
-                    <label for="imageMorning">Image (Morning)</label>
-                    <input type="file" id="imageMorning" accept="image/*">
-                    <img id="previewMorning" class="image-preview" src="#" alt="Preview">
-                </div>
+                <button type="submit" id="submitButton">
+                    <span class="button-text">💾 บันทึกข้อมูล</span>
+                    <span class="loader" style="display: none;"></span>
+                </button>
+            </form>
 
-                <div class="form-group">
-                    <label for="descAfternoonEN">Description (Afternoon)</label>
-                    <textarea id="descAfternoonEN" rows="3"></textarea>
-                </div>
-                 <div class="form-group">
-                    <label for="descAfternoonCN">描述 (下午)</label>
-                    <textarea id="descAfternoonCN" rows="3"></textarea>
-                </div>
-                <div class="form-group span-2 file-upload">
-                    <label for="imageAfternoon">Image (Afternoon)</label>
-                    <input type="file" id="imageAfternoon" accept="image/*">
-                    <img id="previewAfternoon" class="image-preview" src="#" alt="Preview">
-                </div>
+            <hr>
 
-                <div class="form-group span-4">
-                    <label for="remarks">Remarks / 备注</label>
-                    <textarea id="remarks" rows="3"></textarea>
+            <section id="report-section">
+                <h2>📊 รายงานความคืบหน้าทั้งหมด</h2>
+                <div id="reportContainer">
+                    <div class="loading-data">กำลังโหลดข้อมูล...</div>
                 </div>
-            </div>
-            
-            <button type="submit" id="submitButton">
-                <span class="button-text">💾 บันทึกข้อมูล</span>
-                <span class="loader" style="display: none;"></span>
-            </button>
-        </form>
-
-        <hr>
-
-        <h2>📊 รายงานความคืบหน้า</h2>
-        <div id="reportContainer">
-            <p>กำลังโหลดข้อมูล...</p>
-        </div>
+            </section>
+        </main>
     </div>
 
     <script src="script.js"></script>
