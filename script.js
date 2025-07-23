@@ -3,7 +3,7 @@
 // ===============================================================
 
 // 🔴 วาง URL ของเว็บแอปที่คุณคัดลอกมา ที่นี่
-const SCRIPT_URL = 'YOUR_WEB_APP_URL_HERE'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFSCwfQ4gB_RJIg_g-DtHCaiF3Xi_E4LlDf2TSCA2uysf5yQhNIEGGTN9PbyMhBwHKkQ/exec'; 
 
 // --- DOM Elements ---
 const form = document.getElementById('reportForm');
