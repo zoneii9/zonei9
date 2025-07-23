@@ -7,13 +7,7 @@ const buttonText = document.querySelector('#submitButton .button-text');
 const loader = document.querySelector('#submitButton .loader');
 const reportContainer = document.getElementById('reportContainer');
 
-// --- Functions ---
 
-/**
- * ฟังก์ชันแปลงไฟล์เป็น Base64 เพื่อส่งไปที่ Apps Script
- * @param {File} file - The file to convert.
- * @returns {Promise<string>} - A promise that resolves with the base64 string.
- */
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -23,11 +17,7 @@ function fileToBase64(file) {
     });
 }
 
-/**
- * ฟังก์ชันแสดง Preview รูปภาพที่ผู้ใช้เลือก
- * @param {string} inputId - The ID of the file input element.
- * @param {string} previewId - The ID of the img element for preview.
- */
+
 function setupImagePreview(inputId, previewId) {
     document.getElementById(inputId).addEventListener('change', function() {
         const file = this.files[0];
@@ -42,9 +32,6 @@ function setupImagePreview(inputId, previewId) {
     });
 }
 
-/**
- * ฟังก์ชันโหลดและแสดงผลรายงานจาก Google Sheet
- */
 async function loadReportData() {
     reportContainer.innerHTML = `<div class="loading-data">กำลังโหลดข้อมูล...</div>`;
     try {
