@@ -1,3 +1,9 @@
+// ===============================================================
+// ==           INSTALLATION WORK REPORT - FRONTEND             ==
+// ==                  VERSION 2 - DEBUG READY                  ==
+// ===============================================================
+
+// 🔴 วาง URL ของเว็บแอปที่คุณคัดลอกมา ที่นี่
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyFSCwfQ4gB_RJIg_g-DtHCaiF3Xi_E4LlDf2TSCA2uysf5yQhNIEGGTN9PbyMhBwHKkQ/exec'; 
 
 // --- DOM Elements ---
@@ -7,6 +13,7 @@ const buttonText = document.querySelector('#submitButton .button-text');
 const loader = document.querySelector('#submitButton .loader');
 const reportContainer = document.getElementById('reportContainer');
 
+// --- Functions ---
 
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
@@ -16,7 +23,6 @@ function fileToBase64(file) {
         reader.onerror = error => reject(error);
     });
 }
-
 
 function setupImagePreview(inputId, previewId) {
     document.getElementById(inputId).addEventListener('change', function() {
@@ -32,17 +38,24 @@ function setupImagePreview(inputId, previewId) {
     });
 }
 
+/**
+ * ฟังก์ชันโหลดและแสดงผลรายงานจาก Google Sheet (เวอร์ชันปรับปรุง)
+ */
 async function loadReportData() {
     reportContainer.innerHTML = `<div class="loading-data">กำลังโหลดข้อมูล...</div>`;
     try {
-        const response = await fetch(SCRIPT_URL); // ใช้ GET request โดยปริยาย
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const response = await fetch(SCRIPT_URL);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
         const result = await response.json();
 
+        // --- DEBUGGING ---
+        // บรรทัดนี้สำคัญมาก! มันจะแสดงข้อมูลดิบที่ได้รับจาก Backend ใน Console
+        console.log("Data received from Google Apps Script:", result);
+        // -----------------
+
         if (result.status === 'success') {
-            if (result.data.length === 0) {
+            if (!result.data || result.data.length === 0) {
                  reportContainer.innerHTML = `<p>ยังไม่มีข้อมูลรายงาน</p>`;
                  return;
             }
@@ -63,30 +76,35 @@ async function loadReportData() {
                     </thead>
                     <tbody>
             `;
-            // แสดงผลจากใหม่ไปเก่า (reverse the array)
+            
             result.data.reverse().forEach(row => {
-                // ดึงข้อมูลโดยใช้ชื่อคอลัมน์จาก Sheet เป็น Key
-                const reportDate = row['วันที่'] ? new Date(row['วันที่']).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric'}) : 'N/A';
+                // สร้าง object ใหม่ที่ key ถูก trim() เพื่อตัดช่องว่างที่ไม่จำเป็นออก
+                const cleanRow = {};
+                for (const key in row) {
+                    cleanRow[key.trim()] = row[key];
+                }
+
+                const reportDate = cleanRow['วันที่'] ? new Date(cleanRow['วันที่']).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric'}) : 'N/A';
                 
                 tableHTML += `
                     <tr>
-                        <td>${row['no.'] || ''}</td>
+                        <td>${cleanRow['no.'] || ''}</td>
                         <td>${reportDate}</td>
                         <td>
-                           <b>${row['Section Title'] || ''}</b><br>
-                           <small>${row['部分标题 (中文)'] || ''}</small>
+                           <b>${cleanRow['Section Title'] || ''}</b><br>
+                           <small>${cleanRow['部分标题 (中文)'] || ''}</small>
                         </td>
                         <td>
-                           ${row['Description (早晨)'] || ''}<br>
-                           <small>${row['描述 (早晨)'] || ''}</small>
+                           ${cleanRow['Description (早晨)'] || ''}<br>
+                           <small>${cleanRow['描述 (早晨)'] || ''}</small>
                         </td>
-                        <td>${row['Image (早晨)'] ? `<a href="${row['Image (早晨)']}" target="_blank"><img src="${row['Image (早晨)']}" alt="Morning Image"></a>` : '-'}</td>
+                        <td>${cleanRow['Image (早晨)'] ? `<a href="${cleanRow['Image (早晨)']}" target="_blank"><img src="${cleanRow['Image (早晨)']}" alt="Morning Image"></a>` : '-'}</td>
                         <td>
-                           ${row['Description (下午)'] || ''}<br>
-                           <small>${row['描述 (下午)'] || ''}</small>
+                           ${cleanRow['Description (下午)'] || ''}<br>
+                           <small>${cleanRow['描述 (下午)'] || ''}</small>
                         </td>
-                        <td>${row['Image (下午)'] ? `<a href="${row['Image (下午)']}" target="_blank"><img src="${row['Image (下午)']}" alt="Afternoon Image"></a>` : '-'}</td>
-                        <td>${row['Remarks / 备注'] || ''}</td>
+                        <td>${cleanRow['Image (下午)'] ? `<a href="${cleanRow['Image (下午)']}" target="_blank"><img src="${cleanRow['Image (下午)']}" alt="Afternoon Image"></a>` : '-'}</td>
+                        <td>${cleanRow['Remarks / 备注'] || ''}</td>
                     </tr>
                 `;
             });
@@ -102,29 +120,19 @@ async function loadReportData() {
 }
 
 // --- Event Listeners ---
-
-/**
- * จัดการการส่งฟอร์ม (Submit Event)
- */
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
-
-    // แสดงสถานะกำลังโหลด
     submitButton.disabled = true;
     buttonText.style.display = 'none';
     loader.style.display = 'inline-block';
 
     try {
-        // จัดการไฟล์รูปภาพ
         const fileMorning = document.getElementById('imageMorning').files[0];
         const fileAfternoon = document.getElementById('imageAfternoon').files[0];
-
         const [base64Morning, base64Afternoon] = await Promise.all([
             fileMorning ? fileToBase64(fileMorning) : Promise.resolve(null),
             fileAfternoon ? fileToBase64(fileAfternoon) : Promise.resolve(null)
         ]);
-
-        // รวบรวมข้อมูลจากฟอร์ม
         const formData = {
             sectionTitleEN: document.getElementById('sectionTitleEN').value,
             sectionTitleCN: document.getElementById('sectionTitleCN').value,
@@ -138,46 +146,35 @@ form.addEventListener('submit', async (e) => {
             imageBase64Afternoon: base64Afternoon,
             fileNameAfternoon: fileAfternoon ? fileAfternoon.name : ''
         };
-
-        // ส่งข้อมูลไปยัง Google Apps Script
         const response = await fetch(SCRIPT_URL, {
             method: 'POST',
             body: JSON.stringify(formData),
-            headers: {
-                'Content-Type': 'text/plain;charset=utf-8', // ใช้ text/plain เพื่อหลีกเลี่ยง CORS preflight
-            },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         });
-
         const result = await response.json();
-        
         if (result.status === 'success') {
             alert('บันทึกข้อมูลสำเร็จ!');
             form.reset();
-            // ซ่อน Preview หลังจากรีเซ็ตฟอร์ม
             document.querySelectorAll('.image-preview').forEach(img => {
                 img.style.display = 'none';
                 img.src = '#';
             });
-            loadReportData(); // โหลดข้อมูลใหม่เพื่อแสดงผลทันที
+            loadReportData();
         } else {
             throw new Error(result.message);
         }
-
     } catch (error) {
         alert('เกิดข้อผิดพลาดในการบันทึก: ' + error.message);
     } finally {
-        // คืนค่าปุ่มกลับเป็นปกติ
         submitButton.disabled = false;
         buttonText.style.display = 'inline';
         loader.style.display = 'none';
     }
 });
 
-/**
- * เมื่อหน้าเว็บโหลดเสร็จ ให้เริ่มทำงาน
- */
 document.addEventListener('DOMContentLoaded', () => {
     setupImagePreview('imageMorning', 'previewMorning');
     setupImagePreview('imageAfternoon', 'previewAfternoon');
     loadReportData();
 });
+
